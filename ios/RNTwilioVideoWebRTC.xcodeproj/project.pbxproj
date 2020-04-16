@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		196131492449238500E4DAD9 /* RCTBroadcastPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 196131482449238500E4DAD9 /* RCTBroadcastPicker.swift */; };
+		1961314B244923C800E4DAD9 /* RCTBroadcastPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1961314A244923C800E4DAD9 /* RCTBroadcastPicker.m */; };
 		73814A34203776CD00E8C67D /* RCTTWLocalVideoViewManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 738F9D69203760FF00058972 /* RCTTWLocalVideoViewManager.h */; };
 		73814A35203776CD00E8C67D /* RCTTWRemoteVideoViewManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 738F9D6A203760FF00058972 /* RCTTWRemoteVideoViewManager.h */; };
 		73814A36203776CD00E8C67D /* RCTTWSerializable.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 738F9D65203760FF00058972 /* RCTTWSerializable.h */; };
@@ -35,6 +37,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		196131472449238400E4DAD9 /* RNTwilioVideoWebRTC-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNTwilioVideoWebRTC-Bridging-Header.h"; sourceTree = "<group>"; };
+		196131482449238500E4DAD9 /* RCTBroadcastPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCTBroadcastPicker.swift; sourceTree = "<group>"; };
+		1961314A244923C800E4DAD9 /* RCTBroadcastPicker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTBroadcastPicker.m; sourceTree = "<group>"; };
 		738F9D552037604000058972 /* libRNTwilioVideoWebRTC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTwilioVideoWebRTC.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		738F9D63203760FF00058972 /* RCTTWVideoModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCTTWVideoModule.h; sourceTree = SOURCE_ROOT; };
 		738F9D64203760FF00058972 /* RCTTWSerializable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCTTWSerializable.m; sourceTree = SOURCE_ROOT; };
@@ -80,6 +85,8 @@
 			isa = PBXGroup;
 			children = (
 				738F9D69203760FF00058972 /* RCTTWLocalVideoViewManager.h */,
+				196131482449238500E4DAD9 /* RCTBroadcastPicker.swift */,
+				1961314A244923C800E4DAD9 /* RCTBroadcastPicker.m */,
 				738F9D67203760FF00058972 /* RCTTWLocalVideoViewManager.m */,
 				738F9D6A203760FF00058972 /* RCTTWRemoteVideoViewManager.h */,
 				738F9D66203760FF00058972 /* RCTTWRemoteVideoViewManager.m */,
@@ -87,6 +94,7 @@
 				738F9D64203760FF00058972 /* RCTTWSerializable.m */,
 				738F9D63203760FF00058972 /* RCTTWVideoModule.h */,
 				738F9D68203760FF00058972 /* RCTTWVideoModule.m */,
+				196131472449238400E4DAD9 /* RNTwilioVideoWebRTC-Bridging-Header.h */,
 			);
 			name = RNTwilioVideoWebRTC;
 			sourceTree = "<group>";
@@ -130,7 +138,8 @@
 				TargetAttributes = {
 					738F9D542037604000058972 = {
 						CreatedOnToolsVersion = 9.2;
-						ProvisioningStyle = Automatic;
+						LastSwiftMigration = 1010;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -156,6 +165,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				196131492449238500E4DAD9 /* RCTBroadcastPicker.swift in Sources */,
+				1961314B244923C800E4DAD9 /* RCTBroadcastPicker.m in Sources */,
 				738F9D6E203760FF00058972 /* RCTTWVideoModule.m in Sources */,
 				738F9D6C203760FF00058972 /* RCTTWRemoteVideoViewManager.m in Sources */,
 				738F9D6B203760FF00058972 /* RCTTWSerializable.m in Sources */,
@@ -287,9 +298,13 @@
 					"${SRCROOT}/../../../ios/Pods/TwilioVideo/TwilioVideo/**",
 					"$(SRCROOT)/../../../ios/Carthage/Build/**",
 				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNTwilioVideoWebRTC-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -297,6 +312,7 @@
 		738F9D602037604000058972 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -311,9 +327,12 @@
 					"${SRCROOT}/../../../ios/Pods/TwilioVideo/TwilioVideo/**",
 					"$(SRCROOT)/../../../ios/Carthage/Build/**",
 				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNTwilioVideoWebRTC-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
