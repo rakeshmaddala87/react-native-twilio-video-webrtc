@@ -330,6 +330,7 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
     NSUserDefaults *userDefaults = [[NSUserDefaults alloc]
                                     initWithSuiteName:@"group.asia.prudential.digital"];
     [userDefaults setObject:accessToken forKey:@"twilio_access_token"];
+    [userDefaults setObject:roomName forKey:@"twilio_room_name"];
 }
 
 RCT_EXPORT_METHOD(disconnect) {
@@ -357,7 +358,30 @@ RCT_EXPORT_METHOD(disconnect) {
     [participants addObject:[localParticipant toJSON]];
     [self sendEventCheckingListenerWithName:roomDidConnect body:@{ @"roomName" : room.name , @"roomSid": room.sid, @"participants" : participants }];
     
+    //Sj: when broadcast starts remove the video
+    if (@available(iOS 11.0, *)) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(onBroadcastNotificationReceived:)
+                                                     name: UIScreenCapturedDidChangeNotification
+                                                   object:nil];
+    }
 }
+
+- (void) onBroadcastNotificationReceived:(NSNotification *) notification
+{
+    //   [self.localVideoTrack setEnabled:false];
+    if (@available(iOS 11.0, *)) {
+        if(UIScreen.mainScreen.isCaptured == true) {
+            [self stopLocalVideo];
+            [self stopLocalAudio];
+        } else {
+            [self startLocalAudio];
+            [self startLocalVideo: false];
+        }
+    }
+}
+
+
 
 - (void)room:(TVIRoom *)room didDisconnectWithError:(nullable NSError *)error {
     self.room = nil;
