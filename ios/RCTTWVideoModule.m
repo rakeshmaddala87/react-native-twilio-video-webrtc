@@ -34,6 +34,7 @@ static NSString* statsReceived                = @"statsReceived";
 @property (strong, nonatomic) TVICameraSource *camera;
 @property (strong, nonatomic) TVILocalVideoTrack* localVideoTrack;
 @property (strong, nonatomic) TVILocalAudioTrack* localAudioTrack;
+@property (nonatomic, strong) TVILocalParticipant *localParticipant;
 @property (strong, nonatomic) TVIRoom *room;
 @property (nonatomic) BOOL listening;
 
@@ -109,34 +110,24 @@ RCT_EXPORT_METHOD(setRemoteAudioPlayback:(NSString *)participantSid enabled:(BOO
     }
 }
 
-RCT_EXPORT_METHOD(startLocalVideo:(BOOL)screenShare) {
-    if(screenShare == true) {
-        //        ReplayKitVideoSource *videoSource = [[ReplayKitVideoSource alloc] isScreencast:true telecineOptions: ReplayKitVideoSource.TelecineOptions.disabled];
-        //
-        //        self.localVideoTrack = [TVILocalVideoTrack trackWithSource: videoSource
-        //                                    enabled:YES
-        //                                       name:@"Screen"];
+RCT_EXPORT_METHOD(startLocalVideo) {
+    AVCaptureDevice *frontCamera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionFront];
+    AVCaptureDevice *backCamera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionBack];
+    
+    if (frontCamera != nil || backCamera != nil) {
+        self.camera = [[TVICameraSource alloc] initWithDelegate:self];
+        self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera
+                                                           enabled:YES
+                                                              name:@"Camera"];
         
-    } else {
-        AVCaptureDevice *frontCamera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionFront];
-        AVCaptureDevice *backCamera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionBack];
-        
-        if (frontCamera != nil || backCamera != nil) {
-            self.camera = [[TVICameraSource alloc] initWithDelegate:self];
-            self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera
-                                                               enabled:YES
-                                                                  name:@"Camera"];
-            
-            [self.camera startCaptureWithDevice:frontCamera != nil ? frontCamera : backCamera
-                                     completion:^(AVCaptureDevice *device, TVIVideoFormat *format, NSError *error) {
-                                         if (error == nil) {
-                                             for (TVIVideoView *r in self.localVideoTrack.renderers) {
-                                                 r.mirror = (device.position == AVCaptureDevicePositionFront);;
-                                             }
+        [self.camera startCaptureWithDevice:frontCamera != nil ? frontCamera : backCamera
+                                 completion:^(AVCaptureDevice *device, TVIVideoFormat *format, NSError *error) {
+                                     if (error == nil) {
+                                         for (TVIVideoView *r in self.localVideoTrack.renderers) {
+                                             r.mirror = (device.position == AVCaptureDevicePositionFront);;
                                          }
-                                     }];
-        }
-        
+                                     }
+                                 }];
     }
 }
 
@@ -146,7 +137,11 @@ RCT_EXPORT_METHOD(startLocalAudio) {
 
 RCT_EXPORT_METHOD(stopLocalVideo) {
     self.localVideoTrack = nil;
-    self.camera = nil;
+    if(self.camera) {
+        [self.camera stopCapture];
+        self.camera = nil;
+    }
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 RCT_EXPORT_METHOD(stopLocalAudio) {
@@ -354,8 +349,8 @@ RCT_EXPORT_METHOD(disconnect) {
         p.delegate = self;
         [participants addObject:[p toJSON]];
     }
-    TVILocalParticipant *localParticipant = room.localParticipant;
-    [participants addObject:[localParticipant toJSON]];
+    self.localParticipant = room.localParticipant;
+    [participants addObject:[self.localParticipant toJSON]];
     [self sendEventCheckingListenerWithName:roomDidConnect body:@{ @"roomName" : room.name , @"roomSid": room.sid, @"participants" : participants }];
     
     //Sj: when broadcast starts remove the video
@@ -369,14 +364,23 @@ RCT_EXPORT_METHOD(disconnect) {
 
 - (void) onBroadcastNotificationReceived:(NSNotification *) notification
 {
-    //   [self.localVideoTrack setEnabled:false];
     if (@available(iOS 11.0, *)) {
         if(UIScreen.mainScreen.isCaptured == true) {
-            [self stopLocalVideo];
-            [self stopLocalAudio];
+            if (self.localVideoTrack) {
+                [self stopLocalAudio];
+                [self.localParticipant unpublishVideoTrack:self.localVideoTrack];
+                [self.camera stopCaptureWithCompletion:^(NSError *error) {
+                    self.localVideoTrack = nil;
+                    self.camera = nil;
+                }];
+            }
         } else {
-            [self startLocalAudio];
-            [self startLocalVideo: false];
+            if(!self.localVideoTrack){
+                [self startLocalAudio];
+                [self startLocalVideo];
+                // Publish video so other Room Participants can subscribe
+                [self.localParticipant publishVideoTrack:self.localVideoTrack];
+            }
         }
     }
 }
@@ -385,6 +389,8 @@ RCT_EXPORT_METHOD(disconnect) {
 
 - (void)room:(TVIRoom *)room didDisconnectWithError:(nullable NSError *)error {
     self.room = nil;
+    self.localParticipant = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     NSMutableDictionary *body = [@{ @"roomName": room.name, @"roomSid": room.sid } mutableCopy];
     
