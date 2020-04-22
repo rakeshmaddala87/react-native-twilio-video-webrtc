@@ -8,6 +8,7 @@
 
 import UIKit
 import ReplayKit
+import TwilioVideo
 
 class BroadcastPicker: UIView {
     
@@ -23,16 +24,7 @@ class BroadcastPicker: UIView {
     
     // in here you can configure your view
     private func setupView() {
-        self.backgroundColor = .green
         self.isUserInteractionEnabled = true
-        //
-        //        let button = UIButton()
-        //        button.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
-        //        button.backgroundColor = .red
-        //        button.setTitle("Name your Button ", for: .normal)
-        //
-        //        self.addSubview(button)
-        //
         // Use RPSystemBroadcastPickerView when available (iOS 12+ devices).
         if #available(iOS 12.0, *) {
             setupPickerView()
@@ -49,7 +41,7 @@ class BroadcastPicker: UIView {
             // The issue is resolved in iOS 13.1.
             if #available(iOS 13.1, *) {
             } else {
-                //                broadcastButton.addTarget(self, action: #selector(tapBroadcastPickeriOS13(sender:)), for: UIControl.Event.touchUpInside)
+//                broadcastButton.addTarget(self, action: #selector(tapBroadcastPickeriOS13(sender:)), for: UIControl.Event.touchUpInside)
                 return
             }
         }
@@ -57,16 +49,16 @@ class BroadcastPicker: UIView {
         // SJ: setup the picker view to select the broadcast service
         let pickerView = RPSystemBroadcastPickerView(frame: CGRect(x: 0,
                                                                    y: 0,
-                                                                   width: 80,
-                                                                   height: 80))
+                                                                   width: 50,
+                                                                   height: 50))
         pickerView.translatesAutoresizingMaskIntoConstraints = false
-        
         //SJ: show the preferred extension - in our case its our own extension
         pickerView.preferredExtension = "com.prudential.pulse.uat.PulseBroadcaster"
+        pickerView.showsMicrophoneButton = false
         
         // Theme the picker view to match the white that we want.
         if let button = pickerView.subviews.first as? UIButton {
-            button.imageView?.tintColor = UIColor.white
+            button.imageView?.tintColor = UIColor.gray
         }
         
         //SJ: add the picker to the view
@@ -86,7 +78,7 @@ class BroadcastPicker: UIView {
                                          toItem: self,
                                          attribute: NSLayoutConstraint.Attribute.centerY,
                                          multiplier: 1,
-                                         constant: -10);
+                                         constant: 0);
         self.addConstraint(centerY)
         let width = NSLayoutConstraint(item: pickerView,
                                        attribute: NSLayoutConstraint.Attribute.width,
@@ -106,9 +98,9 @@ class BroadcastPicker: UIView {
         self.addConstraint(height)
         #endif
     }
-    
-}
 
+}
+    
 @objc (RCTBroadcastPickerViewManager)
 class RCTBroadcastPickerViewManager: RCTViewManager {
     
