@@ -33,9 +33,11 @@ static NSString* statsReceived                = @"statsReceived";
 
 @property (strong, nonatomic) TVICameraSource *camera;
 @property (strong, nonatomic) TVILocalVideoTrack* localVideoTrack;
+@property (strong, nonatomic) TVIVideoView * localVideoView;
 @property (strong, nonatomic) TVILocalAudioTrack* localAudioTrack;
-@property (nonatomic, strong) TVILocalParticipant *localParticipant;
+@property (strong, nonatomic) TVILocalParticipant *localParticipant;
 @property (strong, nonatomic) TVIRoom *room;
+
 @property (nonatomic) BOOL listening;
 
 @end
@@ -74,10 +76,12 @@ RCT_EXPORT_MODULE();
 
 - (void)addLocalView:(TVIVideoView *)view {
     [self.localVideoTrack addRenderer:view];
+    self.localVideoView = view;
 }
 
 - (void)removeLocalView:(TVIVideoView *)view {
     [self.localVideoTrack removeRenderer:view];
+    self.localVideoView = nil;
 }
 
 - (void)removeParticipantView:(TVIVideoView *)view sid:(NSString *)sid trackSid:(NSString *)trackSid {
@@ -184,33 +188,31 @@ RCT_EXPORT_METHOD(flipCamera) {
 }
 
 RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {
-    //  if(speaker){
-    //      kDefaultAVAudioSessionConfigurationBlock();
-    //
-    //      // Overwrite the audio route
-    //      AVAudioSession *session = [AVAudioSession sharedInstance];
-    //      NSError *error = nil;
-    //      if (![session setMode:AVAudioSessionModeVideoChat error:&error]) {
-    //          NSLog(@"AVAudiosession setMode %@",error);
-    //      }
-    //
-    //      if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
-    //          NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
-    //      }
-    //    } else {
-    //      kDefaultAVAudioSessionConfigurationBlock();
-    //
-    //      // Overwrite the audio route
-    //      AVAudioSession *session = [AVAudioSession sharedInstance];
-    //      NSError *error = nil;
-    //      if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
-    //          NSLog(@"AVAudiosession setMode %@",error);
-    //      }
-    //
-    //      if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
-    //          NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
-    //      }
-    //    }
+    if(speaker){
+        // Overwrite the audio route
+        kTVIDefaultAVAudioSessionConfigurationBlock();
+        AVAudioSession *session = [AVAudioSession sharedInstance];
+        NSError *error = nil;
+        if (![session setMode:AVAudioSessionModeVideoChat error:&error]) {
+            NSLog(@"AVAudiosession setMode %@",error);
+        }
+        
+        if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
+            NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+        }
+    } else {
+        // Overwrite the audio route
+        kTVIDefaultAVAudioSessionConfigurationBlock();
+        AVAudioSession *session = [AVAudioSession sharedInstance];
+        NSError *error = nil;
+        if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
+            NSLog(@"AVAudiosession setMode %@",error);
+        }
+        
+        if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
+            NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+        }
+    }
 }
 
 -(void)convertBaseTrackStats:(TVIBaseTrackStats *)stats result:(NSMutableDictionary *)result {
@@ -367,7 +369,7 @@ RCT_EXPORT_METHOD(disconnect) {
     if (@available(iOS 11.0, *)) {
         if(UIScreen.mainScreen.isCaptured == true) {
             if (self.localVideoTrack) {
-                [self stopLocalAudio];
+                //memory optimization
                 [self.localParticipant unpublishVideoTrack:self.localVideoTrack];
                 [self.camera stopCaptureWithCompletion:^(NSError *error) {
                     self.localVideoTrack = nil;
@@ -376,10 +378,12 @@ RCT_EXPORT_METHOD(disconnect) {
             }
         } else {
             if(!self.localVideoTrack){
-                [self startLocalAudio];
                 [self startLocalVideo];
-                // Publish video so other Room Participants can subscribe
                 [self.localParticipant publishVideoTrack:self.localVideoTrack];
+                
+                if(self.localVideoView) {
+                    [self.localVideoTrack addRenderer:self.localVideoView];
+                }
             }
         }
     }
