@@ -34,8 +34,7 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
         view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
       } else if(scaleType.equals("balanced")){
         view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED);
-      } 
-      else {
+      } else {
         view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
       }
     }

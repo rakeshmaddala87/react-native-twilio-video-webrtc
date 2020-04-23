@@ -324,10 +324,6 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
     }];
     
     self.room = [TwilioVideoSDK connectWithOptions:connectOptions delegate:self];
-    NSUserDefaults *userDefaults = [[NSUserDefaults alloc]
-                                    initWithSuiteName:@"group.asia.prudential.digital"];
-    [userDefaults setObject:accessToken forKey:@"twilio_access_token"];
-    [userDefaults setObject:roomName forKey:@"twilio_room_name"];
 }
 
 RCT_EXPORT_METHOD(disconnect) {
