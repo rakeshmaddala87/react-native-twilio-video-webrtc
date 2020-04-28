@@ -53,7 +53,7 @@ class BroadcastPicker: UIView {
                                                                    height: 50))
         pickerView.translatesAutoresizingMaskIntoConstraints = false
         //SJ: show the preferred extension - in our case its our own extension
-        pickerView.preferredExtension = "com.prudential.pulse.uat.PulseBroadcaster"
+        pickerView.preferredExtension = "com.prudential.pulse.uat.pbc"
         pickerView.showsMicrophoneButton = false
         
         // Theme the picker view to match the white that we want.
