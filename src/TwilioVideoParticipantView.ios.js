@@ -24,8 +24,22 @@ class TwilioVideoParticipantView extends Component {
     })
   }
 
+  getScaleType = (scalesType) => {
+    switch(scalesType) {
+      case "fill":
+        return 1; //UIViewContentModeScaleToFill
+      case "fit": 
+        return 2; //UIViewContentModeScaleAspectFit
+      case "balanced":
+        return 3; //UIViewContentModeScaleAspectFill
+      default:
+        return 2; //explicitly set for readability
+    }
+  }
+
   render () {
-    const scalesType = this.props.scaleType === 'fit' ? 1 : 2
+    
+    const scalesType = this.getScaleType(this.props.scaleType);
     return (
       <RCTTWRemoteVideoView scalesType={scalesType} {...this.props}>
         {this.props.children}
