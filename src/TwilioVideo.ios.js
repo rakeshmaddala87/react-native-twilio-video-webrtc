@@ -321,7 +321,17 @@ export default class extends Component {
         if (this.props.onStatsReceived) {
           this.props.onStatsReceived(data)
         }
-      })
+      }),
+      this._eventEmitter.addListener('screenshareDidStart', data => {
+        if (this.props.onScreenshareStart) {
+          this.props.onScreenshareStart(data)
+        }
+      }),
+      this._eventEmitter.addListener('screenshareDidStop', data => {
+        if (this.props.onScreenshareStop) {
+          this.props.onScreenshareStop(data)
+        }
+      }),
     ]
   }
 

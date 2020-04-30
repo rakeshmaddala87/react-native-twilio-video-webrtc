@@ -28,6 +28,8 @@ static NSString* cameraDidStart               = @"cameraDidStart";
 static NSString* cameraWasInterrupted         = @"cameraWasInterrupted";
 static NSString* cameraDidStopRunning         = @"cameraDidStopRunning";
 static NSString* statsReceived                = @"statsReceived";
+static NSString* screenshareDidStart          = @"screenshareDidStart";
+static NSString* screenshareDidStop           = @"screenshareDidStop";
 
 @interface RCTTWVideoModule () <TVIRemoteParticipantDelegate, TVIRoomDelegate, TVICameraSourceDelegate>
 
@@ -70,7 +72,9 @@ RCT_EXPORT_MODULE();
              cameraDidStopRunning,
              cameraDidStart,
              cameraWasInterrupted,
-             statsReceived
+             statsReceived,
+             screenshareDidStart,
+             screenshareDidStop
              ];
 }
 
@@ -371,6 +375,7 @@ RCT_EXPORT_METHOD(disconnect) {
                     self.localVideoTrack = nil;
                     self.camera = nil;
                 }];
+                [self sendEventCheckingListenerWithName:screenshareDidStart body:@{}];
             }
         } else {
             if(!self.localVideoTrack){
@@ -380,6 +385,7 @@ RCT_EXPORT_METHOD(disconnect) {
                 if(self.localVideoView) {
                     [self.localVideoTrack addRenderer:self.localVideoView];
                 }
+                [self sendEventCheckingListenerWithName:screenshareDidStop body:@{}];
             }
         }
     }
