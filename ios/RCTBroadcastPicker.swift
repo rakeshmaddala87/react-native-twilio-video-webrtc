@@ -33,7 +33,6 @@ class BroadcastPicker: UIView {
     
     @available(iOS 12.0, *)
     func setupPickerView() {
-        // Swap the button for an RPSystemBroadcastPickerView.
         #if !targetEnvironment(simulator)
         // iOS 13.0 throws an NSInvalidArgumentException when RPSystemBroadcastPickerView is used to start a broadcast.
         // https://stackoverflow.com/questions/57163212/get-nsinvalidargumentexception-when-trying-to-present-rpsystembroadcastpickervie
@@ -41,7 +40,7 @@ class BroadcastPicker: UIView {
             // The issue is resolved in iOS 13.1.
             if #available(iOS 13.1, *) {
             } else {
-//                broadcastButton.addTarget(self, action: #selector(tapBroadcastPickeriOS13(sender:)), for: UIControl.Event.touchUpInside)
+                 //show alert that broadcast is not available of 13.0.*
                 return
             }
         }
@@ -58,10 +57,11 @@ class BroadcastPicker: UIView {
         
         // Theme the picker view to match the white that we want.
         if let button = pickerView.subviews.first as? UIButton {
-            button.imageView?.tintColor = UIColor.gray
+            if(button.imageView != nil){
+                button.setImage(nil, for: .normal)
+            }
         }
         
-        //SJ: add the picker to the view
         self.addSubview(pickerView)
         
         let centerX = NSLayoutConstraint(item:pickerView,
