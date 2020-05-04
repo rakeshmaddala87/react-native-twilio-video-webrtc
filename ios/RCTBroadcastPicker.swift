@@ -31,6 +31,14 @@ class BroadcastPicker: UIView {
         }
     }
     
+    @objc(setExtId:)
+    func setExtId(extId: String) {
+        if #available(iOS 12.0, *) {
+            let pickerView = self.subviews[0] as! RPSystemBroadcastPickerView
+            pickerView.preferredExtension = extId;
+        }
+    }
+    
     @available(iOS 12.0, *)
     func setupPickerView() {
         #if !targetEnvironment(simulator)
@@ -51,8 +59,6 @@ class BroadcastPicker: UIView {
                                                                    width: 50,
                                                                    height: 50))
         pickerView.translatesAutoresizingMaskIntoConstraints = false
-        //SJ: show the preferred extension - in our case its our own extension
-        pickerView.preferredExtension = "com.prudential.pulse.uat.pbc"
         pickerView.showsMicrophoneButton = false
         
         // Theme the picker view to match the white that we want.
@@ -111,5 +117,4 @@ class RCTBroadcastPickerViewManager: RCTViewManager {
     override func view() -> UIView! {
         return BroadcastPicker()
     }
-    
 }
