@@ -33,10 +33,12 @@ class BroadcastPicker: UIView {
     
     @objc(setExtId:)
     func setExtId(extId: String) {
+        #if !targetEnvironment(simulator)
         if #available(iOS 12.0, *) {
             let pickerView = self.subviews[0] as! RPSystemBroadcastPickerView
             pickerView.preferredExtension = extId;
         }
+        #endif
     }
     
     @available(iOS 12.0, *)
