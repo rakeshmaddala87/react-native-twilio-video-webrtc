@@ -127,7 +127,9 @@ const nativeEvents = {
   toggleSoundSetup: 8,
   toggleRemoteSound: 9,
   releaseResource: 10,
-  toggleBluetoothHeadset: 11
+  toggleBluetoothHeadset: 11,
+  stopPublishingVideo: 12,
+  startPublishingVideo: 13, 
 }
 
 class CustomTwilioVideoView extends Component {
@@ -149,6 +151,14 @@ class CustomTwilioVideoView extends Component {
 
   disconnect () {
     this.runCommand(nativeEvents.disconnect, [])
+  }
+
+  stopPublishingVideo () {
+    this.runCommand(nativeEvents.stopPublishingVideo, [])
+  }
+
+  startPublishingVideo () {
+    this.runCommand(nativeEvents.startPublishingVideo, [])
   }
 
   componentWillUnmount () {

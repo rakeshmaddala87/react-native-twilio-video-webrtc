@@ -633,6 +633,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
     }
 
+    // ====== STOP/START VIDEO PUBLISHING ==========================================================
+    public void stopPublishingVideo() {
+        onHostPause();
+    }
+
+    public void startPublishingVideo() {
+        onHostResume();
+    }
+
     // ====== ROOM LISTENER ========================================================================
 
     /*
