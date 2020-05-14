@@ -146,6 +146,14 @@ export default class extends Component {
     this._stopLocalAudio()
   }
 
+  stopPublishingVideo () {
+    TWVideoModule.stopPublishingVideo();
+  }
+
+  startPublishingVideo () {
+    TWVideoModule.startPublishingVideo();
+  }
+
   /**
    * Locally mute/ unmute all remote audio tracks from a given participant
    */

@@ -118,6 +118,30 @@ RCT_EXPORT_METHOD(setRemoteAudioPlayback:(NSString *)participantSid enabled:(BOO
     }
 }
 
+RCT_EXPORT_METHOD(startPublishingVideo) {
+    if(!self.localVideoTrack){
+        [self startLocalVideo];
+        [self.localParticipant publishVideoTrack:self.localVideoTrack];
+        
+        if(self.localVideoView) {
+            [self.localVideoTrack addRenderer:self.localVideoView];
+        }
+        [self sendEventCheckingListenerWithName:screenshareDidStop body:@{}];
+    }
+}
+
+RCT_EXPORT_METHOD(stopPublishingVideo) {
+    if (self.localVideoTrack) {
+        //memory optimization
+        [self.localParticipant unpublishVideoTrack:self.localVideoTrack];
+        [self.camera stopCaptureWithCompletion:^(NSError *error) {
+            self.localVideoTrack = nil;
+            self.camera = nil;
+        }];
+        [self sendEventCheckingListenerWithName:screenshareDidStart body:@{}];
+    }
+}
+
 RCT_EXPORT_METHOD(startLocalVideo) {
     AVCaptureDevice *frontCamera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionFront];
     AVCaptureDevice *backCamera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionBack];
@@ -368,25 +392,9 @@ RCT_EXPORT_METHOD(disconnect) {
 {
     if (@available(iOS 11.0, *)) {
         if(UIScreen.mainScreen.isCaptured == true) {
-            if (self.localVideoTrack) {
-                //memory optimization
-                [self.localParticipant unpublishVideoTrack:self.localVideoTrack];
-                [self.camera stopCaptureWithCompletion:^(NSError *error) {
-                    self.localVideoTrack = nil;
-                    self.camera = nil;
-                }];
-                [self sendEventCheckingListenerWithName:screenshareDidStart body:@{}];
-            }
+            [self stopPublishingVideo];
         } else {
-            if(!self.localVideoTrack){
-                [self startLocalVideo];
-                [self.localParticipant publishVideoTrack:self.localVideoTrack];
-                
-                if(self.localVideoView) {
-                    [self.localVideoTrack addRenderer:self.localVideoView];
-                }
-                [self sendEventCheckingListenerWithName:screenshareDidStop body:@{}];
-            }
+            [self startPublishingVideo];
         }
     }
 }
