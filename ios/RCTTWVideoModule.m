@@ -126,7 +126,6 @@ RCT_EXPORT_METHOD(startPublishingVideo) {
         if(self.localVideoView) {
             [self.localVideoTrack addRenderer:self.localVideoView];
         }
-        [self sendEventCheckingListenerWithName:screenshareDidStop body:@{}];
     }
 }
 
@@ -138,7 +137,6 @@ RCT_EXPORT_METHOD(stopPublishingVideo) {
             self.localVideoTrack = nil;
             self.camera = nil;
         }];
-        [self sendEventCheckingListenerWithName:screenshareDidStart body:@{}];
     }
 }
 
@@ -392,9 +390,15 @@ RCT_EXPORT_METHOD(disconnect) {
 {
     if (@available(iOS 11.0, *)) {
         if(UIScreen.mainScreen.isCaptured == true) {
-            [self stopPublishingVideo];
+            if (self.localVideoTrack) {
+                [self stopPublishingVideo];
+                [self sendEventCheckingListenerWithName:screenshareDidStart body:@{}];
+            }
         } else {
-            [self startPublishingVideo];
+            if(!self.localVideoTrack){
+                [self startPublishingVideo];
+                [self sendEventCheckingListenerWithName:screenshareDidStop body:@{}];
+            }
         }
     }
 }
