@@ -32,6 +32,8 @@ public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPrev
     public void setScaleType(TwilioVideoPreview view, @Nullable String scaleType) {
       if (scaleType.equals("fit")) {
         view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+      } else if(scaleType.equals("balanced")){
+        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED);
       } else {
         view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
       }

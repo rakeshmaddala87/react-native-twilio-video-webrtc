@@ -89,6 +89,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED
 public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "CustomTwilioVideoView";
     private boolean enableRemoteAudio = false;
+    private boolean videoPublishingOn = true;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -252,7 +253,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         /*
          * In case it wasn't set.
          */
-        if (themedReactContext.getCurrentActivity() != null) {
+        if (themedReactContext.getCurrentActivity() != null && videoPublishingOn == true) {
             /*
              * If the local video track was released when the app was put in the background, recreate.
              */
@@ -631,6 +632,17 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public void disableOpenSLES() {
         WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
+    }
+
+    // ====== STOP/START VIDEO PUBLISHING ==========================================================
+    public void stopPublishingVideo() {
+        videoPublishingOn = false;
+        onHostPause();
+    }
+
+    public void startPublishingVideo() {
+        videoPublishingOn = true;
+        onHostResume();
     }
 
     // ====== ROOM LISTENER ========================================================================
