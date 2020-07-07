@@ -8,7 +8,9 @@
  */
 package com.twiliorn.library;
 
-import android.support.annotation.Nullable;
+import android.app.Activity;
+
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
@@ -39,7 +41,8 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVE
 
 public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilioVideoView> {
     public static final String REACT_CLASS = "RNCustomTwilioVideoView";
-
+    private static CustomTwilioVideoView customTwilioVideoView= null;
+    CustomTwilioVideoView customTwilioVideo;
     private static final int CONNECT_TO_ROOM = 1;
     private static final int DISCONNECT = 2;
     private static final int SWITCH_CAMERA = 3;
@@ -53,6 +56,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int TOGGLE_BLUETOOTH_HEADSET = 11;
     private static final int STOP_PUBLISHING_VIDEO = 12;
     private static final int START_PUBLISHING_VIDEO = 13;
+    private static final int START_SHARE_SCREEN = 14;
+    private static final int STOP_SHARE_SCREEN = 15;
 
     @Override
     public String getName() {
@@ -61,7 +66,17 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
 
     @Override
     protected CustomTwilioVideoView createViewInstance(ThemedReactContext reactContext) {
-        return new CustomTwilioVideoView(reactContext);
+        customTwilioVideo = new CustomTwilioVideoView(reactContext);
+        setView(customTwilioVideo);
+        return customTwilioVideo;
+    }
+
+    private void setView(CustomTwilioVideoView bin){
+        customTwilioVideoView = bin;
+    }
+
+    public static CustomTwilioVideoView getCustomTwilioVideoView() { // <-- returns the View instance
+        return customTwilioVideoView;
     }
 
     @Override
@@ -116,6 +131,12 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case START_PUBLISHING_VIDEO:
                 view.startPublishingVideo();
                 break;
+            case START_SHARE_SCREEN:
+                view.startShare();
+                break;
+            case STOP_SHARE_SCREEN:
+                view.stopScreenCapture();
+                break;
         }
     }
 
@@ -165,6 +186,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 .put("toggleBluetoothHeadset", TOGGLE_BLUETOOTH_HEADSET)
                 .put("stopPublishingVideo", STOP_PUBLISHING_VIDEO)
                 .put("startPublishingVideo", START_PUBLISHING_VIDEO)
+                .put("startShareScreen", START_SHARE_SCREEN)
+                .put("stopShareScreen", STOP_SHARE_SCREEN)
                 .build();
     }
 }

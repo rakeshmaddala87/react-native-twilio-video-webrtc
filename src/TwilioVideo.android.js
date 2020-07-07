@@ -129,7 +129,9 @@ const nativeEvents = {
   releaseResource: 10,
   toggleBluetoothHeadset: 11,
   stopPublishingVideo: 12,
-  startPublishingVideo: 13, 
+  startPublishingVideo: 13,
+  startShareScreen: 14,
+  stopShareScreen: 15
 }
 
 class CustomTwilioVideoView extends Component {
@@ -201,7 +203,14 @@ class CustomTwilioVideoView extends Component {
     this.runCommand(nativeEvents.toggleSoundSetup, [speaker])
   }
 
-  runCommand (event, args) {
+  startShare () {
+    this.runCommand(nativeEvents.startShareScreen, [])
+  }
+
+  stopShare () {
+    this.runCommand(nativeEvents.stopShareScreen, [])
+  }
+  runCommand(event, args) {
     switch (Platform.OS) {
       case 'android':
         UIManager.dispatchViewManagerCommand(
